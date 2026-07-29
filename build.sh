@@ -1,5 +1,5 @@
 #!/bin/bash
-IMAGE_NAME="subashbhaaji/devops-react-app"
+IMAGE_NAME="subashbhaaji/dev"
 TAG=${1:-dev}
 
 echo "Building Docker image with tag: $TAG..."
