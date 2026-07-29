@@ -13,16 +13,14 @@ pipeline {
         stage('Build & Tag Docker Image') {
             steps {
                 script {
-                    // Select repo and tag based on active branch
                     if (env.BRANCH_NAME == 'master') {
-                        env.TARGET_REPO = "${subashbhaaji}/prod"
+                        env.TARGET_REPO = "${DOCKERHUB_USERNAME}/prod"
                         env.IMAGE_TAG = "prod"
                     } else {
-                        env.TARGET_REPO = "${subashbhaaji}/dev"
+                        env.TARGET_REPO = "${DOCKERHUB_USERNAME}/dev"
                         env.IMAGE_TAG = "dev"
                     }
-
-                    // Build image with proper tag pointing to the repo
+                    
                     app = docker.image("${env.TARGET_REPO}:${env.IMAGE_TAG}")
                     app.build()
                 }
@@ -40,7 +38,6 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 script {
-                    // Triggers your deploy script locally on the server running Jenkins
                     sh './deploy.sh'
                 }
             }
