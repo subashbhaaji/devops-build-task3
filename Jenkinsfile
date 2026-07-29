@@ -13,7 +13,7 @@ pipeline {
         stage('Build & Tag Docker Image') {
             steps {
                 script {
-                    if (env.BRANCH_NAME == 'master') {
+                    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'main') {
                         env.TARGET_REPO = "${DOCKERHUB_USERNAME}/prod"
                         env.IMAGE_TAG = "prod"
                     } else {
@@ -21,17 +21,17 @@ pipeline {
                         env.IMAGE_TAG = "dev"
                     }
                     
-                    app = docker.image("${env.TARGET_REPO}:${env.IMAGE_TAG}")
-                    app.build()
+                    // Build using standard docker CLI command via shell
+                    sh "docker build -t ${env.TARGET_REPO}:${env.IMAGE_TAG} ."
                 }
             }
         }
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'DOCKERHUB_CREDENTIALS') {
-                        app.push(env.IMAGE_TAG)
-                    }
+                    // Log in and push using standard Docker CLI commands
+                    sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                    sh "docker push ${env.TARGET_REPO}:${env.IMAGE_TAG}"
                 }
             }
         }
